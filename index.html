@@ -5,23 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Horarios Estación Burgos</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="module">
-        // Importar Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-        // Configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyCrICsFgXkVh2fXU0hBRh4T09LB9bGkrc",
-            authDomain: "horariosburgos.firebaseapp.com",
-            projectId: "horariosburgos",
-            storageBucket: "horariosburgos.appspot.com",
-            messagingSenderId: "362344851763",
-            appId: "1:362344851763:web:124c754c0fe6fb1e7646"
-        };
-
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-    </script>
 </head>
 <body class="bg-gray-100">
     <div class="bg-blue-500 text-white p-4 text-center text-2xl font-bold">
@@ -48,32 +31,34 @@
             </tbody>
         </table>
     </div>
+
     <script>
-        const urlLlegadas = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=0&single=true&output=csv";
-        const urlSalidas = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1924431758&single=true&output=csv";
         let modo = "llegadas";
+        const urls = {
+            "llegadas": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=0&single=true&output=csv",
+            "salidas": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1924431758&single=true&output=csv"
+        };
 
         document.getElementById("llegadasBtn").addEventListener("click", () => {
             modo = "llegadas";
             document.getElementById("origenDestino").innerText = "Origen";
-            cargarDatos(urlLlegadas);
+            cargarDatos(modo);
         });
 
         document.getElementById("salidasBtn").addEventListener("click", () => {
             modo = "salidas";
             document.getElementById("origenDestino").innerText = "Destino";
-            cargarDatos(urlSalidas);
+            cargarDatos(modo);
         });
 
-        async function cargarDatos(url) {
+        async function cargarDatos(tipo) {
             try {
-                const response = await fetch(url);
+                const response = await fetch(urls[tipo]);
                 const data = await response.text();
-                console.log("Datos recibidos:", data);
                 const rows = data.split("\n").slice(1);
                 let tablaHTML = "";
                 rows.forEach(row => {
-                    const cols = row.split(",").map(col => col.trim());
+                    const cols = row.split(",");
                     if (cols.length >= 6) {
                         tablaHTML += `
                             <tr>
@@ -93,7 +78,7 @@
             }
         }
 
-        cargarDatos(urlLlegadas);
+        cargarDatos("llegadas");
     </script>
 </body>
 </html>
