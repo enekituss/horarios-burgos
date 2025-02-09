@@ -31,34 +31,32 @@
             </tbody>
         </table>
     </div>
-
     <script>
+        const urlLlegadas = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=0&single=true&output=csv";
+        const urlSalidas = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1924431758&single=true&output=csv";
         let modo = "llegadas";
-        const urls = {
-            "llegadas": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=0&single=true&output=csv",
-            "salidas": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1924431758&single=true&output=csv"
-        };
 
         document.getElementById("llegadasBtn").addEventListener("click", () => {
             modo = "llegadas";
             document.getElementById("origenDestino").innerText = "Origen";
-            cargarDatos(modo);
+            cargarDatos(urlLlegadas);
         });
 
         document.getElementById("salidasBtn").addEventListener("click", () => {
             modo = "salidas";
             document.getElementById("origenDestino").innerText = "Destino";
-            cargarDatos(modo);
+            cargarDatos(urlSalidas);
         });
 
-        async function cargarDatos(tipo) {
+        async function cargarDatos(url) {
             try {
-                const response = await fetch(urls[tipo]);
+                const response = await fetch(url);
                 const data = await response.text();
+                console.log("Datos recibidos:", data);
                 const rows = data.split("\n").slice(1);
                 let tablaHTML = "";
                 rows.forEach(row => {
-                    const cols = row.split(",");
+                    const cols = row.split(",").map(col => col.trim());
                     if (cols.length >= 6) {
                         tablaHTML += `
                             <tr>
@@ -78,7 +76,7 @@
             }
         }
 
-        cargarDatos("llegadas");
+        cargarDatos(urlLlegadas);
     </script>
 </body>
 </html>
