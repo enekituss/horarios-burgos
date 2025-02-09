@@ -3,80 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Horarios Estación Burgos</title>
+    <title>Alsa Burgos</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100">
-    <div class="bg-blue-500 text-white p-4 text-center text-2xl font-bold">
-        Horarios Estación Burgos
+<body class="bg-gray-50 font-sans">
+
+    <!-- Encabezado -->
+    <div class="bg-[rgb(64,204,236)] text-white p-6 text-center text-3xl font-semibold shadow-lg">
+        Alsa Burgos
     </div>
-    <div class="p-4 flex gap-2">
-        <button id="llegadasBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Llegadas</button>
-        <button id="salidasBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Salidas</button>
+
+    <!-- Día de la semana -->
+    <div class="p-4 flex flex-wrap justify-center gap-4">
+        <button id="lunesBtn" class="bg-[rgb(64,204,236)] text-white px-6 py-3 rounded-full text-xl transition duration-300 hover:bg-[rgb(51,178,202)] focus:outline-none">Lunes</button>
+        <button id="martesBtn" class="bg-[rgb(64,204,236)] text-white px-6 py-3 rounded-full text-xl transition duration-300 hover:bg-[rgb(51,178,202)] focus:outline-none">Martes</button>
+        <button id="miercolesBtn" class="bg-[rgb(64,204,236)] text-white px-6 py-3 rounded-full text-xl transition duration-300 hover:bg-[rgb(51,178,202)] focus:outline-none">Miércoles</button>
+        <button id="juevesBtn" class="bg-[rgb(64,204,236)] text-white px-6 py-3 rounded-full text-xl transition duration-300 hover:bg-[rgb(51,178,202)] focus:outline-none">Jueves</button>
+        <button id="viernesBtn" class="bg-[rgb(64,204,236)] text-white px-6 py-3 rounded-full text-xl transition duration-300 hover:bg-[rgb(51,178,202)] focus:outline-none">Viernes</button>
+        <button id="sabadoBtn" class="bg-[rgb(64,204,236)] text-white px-6 py-3 rounded-full text-xl transition duration-300 hover:bg-[rgb(51,178,202)] focus:outline-none">Sábado</button>
+        <button id="domingoBtn" class="bg-[rgb(64,204,236)] text-white px-6 py-3 rounded-full text-xl transition duration-300 hover:bg-[rgb(51,178,202)] focus:outline-none">Domingo</button>
     </div>
-    <div class="p-4">
-        <table class="min-w-full bg-white border border-gray-300">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="border px-4 py-2">Empresa</th>
-                    <th class="border px-4 py-2">Hora</th>
-                    <th class="border px-4 py-2" id="origenDestino">Origen</th>
-                    <th class="border px-4 py-2">Dársena</th>
-                    <th class="border px-4 py-2">Observaciones</th>
-                    <th class="border px-4 py-2">Itinerario</th>
+
+    <!-- Botones de navegación -->
+    <div class="p-4 flex flex-wrap justify-center gap-4">
+        <button id="llegadasBtn" class="bg-[rgb(64,204,236)] text-white px-6 py-3 rounded-full text-xl transition duration-300 hover:bg-[rgb(51,178,202)] focus:outline-none">Llegadas</button>
+        <button id="salidasBtn" class="bg-[rgb(64,204,236)] text-white px-6 py-3 rounded-full text-xl transition duration-300 hover:bg-[rgb(51,178,202)] focus:outline-none">Salidas</button>
+    </div>
+
+    <!-- Tabla de horarios -->
+    <div class="p-4 max-w-full mx-auto">
+        <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden border border-gray-300">
+            <thead class="bg-[rgb(64,204,236)]">
+                <tr>
+                    <th class="border px-4 py-3 text-sm font-medium text-gray-600">Empresa</th>
+                    <th class="border px-4 py-3 text-sm font-medium text-gray-600">Hora</th>
+                    <th class="border px-4 py-3 text-sm font-medium text-gray-600" id="origenDestino">Origen</th>
+                    <th class="border px-4 py-3 text-sm font-medium text-gray-600">Dársena</th>
+                    <th class="border px-4 py-3 text-sm font-medium text-gray-600">Observaciones</th>
                 </tr>
             </thead>
-            <tbody id="tablaBody">
+            <tbody id="tablaBody" class="text-gray-700">
                 <!-- Datos se insertarán aquí -->
             </tbody>
         </table>
     </div>
-    <script>
-        const urlLlegadas = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=0&single=true&output=csv";
-        const urlSalidas = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1924431758&single=true&output=csv";
-        let modo = "llegadas";
 
+    <script>
+        // URLs de Google Sheets para cada día
+        const horarios = {
+            lunes: {
+                llegadas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=0&single=true&output=csv",
+                salidas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1924431758&single=true&output=csv"
+            },
+            martes: {
+                llegadas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=855344185&single=true&output=csv",
+                salidas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=229148559&single=true&output=csv"
+            },
+            miercoles: {
+                llegadas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=915718068&single=true&output=csv",
+                salidas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1144966705&single=true&output=csv"
+            },
+            jueves: {
+                llegadas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1979005713&single=true&output=csv",
+                salidas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1057662853&single=true&output=csv"
+            },
+            viernes: {
+                llegadas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=757759206&single=true&output=csv",
+                salidas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1403147333&single=true&output=csv"
+            },
+            sabado: {
+                llegadas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1896623574&single=true&output=csv",
+                salidas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=746811688&single=true&output=csv"
+            },
+            domingo: {
+                llegadas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1387044438&single=true&output=csv",
+                salidas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1413882619&single=true&output=csv"
+            }
+        };
+
+        let diaSeleccionado = "";
+
+        // Asignar los eventos para cada día
+        document.getElementById("lunesBtn").addEventListener("click", () => { diaSeleccionado = "lunes"; });
+        document.getElementById("martesBtn").addEventListener("click", () => { diaSeleccionado = "martes"; });
+        document.getElementById("miercolesBtn").addEventListener("click", () => { diaSeleccionado = "miercoles"; });
+        document.getElementById("juevesBtn").addEventListener("click", () => { diaSeleccionado = "jueves"; });
+        document.getElementById("viernesBtn").addEventListener("click", () => { diaSeleccionado = "viernes"; });
+        document.getElementById("sabadoBtn").addEventListener("click", () => { diaSeleccionado = "sabado"; });
+        document.getElementById("domingoBtn").addEventListener("click", () => { diaSeleccionado = "domingo"; });
+
+        // Función para cargar los horarios
+        function cargarHorarios(tipo) {
+            const url = horarios[diaSeleccionado][tipo];
+            fetch(url)
+                .then(response => response.text())
+                .then(csv => {
+                    const rows = csv.split("\n").slice(1); // Eliminar la primera fila de encabezados
+                    const tablaBody = document.getElementById("tablaBody");
+                    tablaBody.innerHTML = "";
+                    rows.forEach(row => {
+                        const cols = row.split(",");
+                        const tr = document.createElement("tr");
+                        cols.forEach(col => {
+                            const td = document.createElement("td");
+                            td.classList.add("border", "px-4", "py-3", "text-sm");
+                            td.textContent = col.trim();
+                            tr.appendChild(td);
+                        });
+                        tablaBody.appendChild(tr);
+                    });
+                });
+        }
+
+        // Asignar los eventos de las opciones de Llegadas y Salidas
         document.getElementById("llegadasBtn").addEventListener("click", () => {
-            modo = "llegadas";
-            document.getElementById("origenDestino").innerText = "Origen";
-            cargarDatos(urlLlegadas);
+            if (diaSeleccionado !== "") cargarHorarios("llegadas");
         });
 
         document.getElementById("salidasBtn").addEventListener("click", () => {
-            modo = "salidas";
-            document.getElementById("origenDestino").innerText = "Destino";
-            cargarDatos(urlSalidas);
+            if (diaSeleccionado !== "") cargarHorarios("salidas");
         });
-
-        async function cargarDatos(url) {
-            try {
-                const response = await fetch(url);
-                const data = await response.text();
-                console.log("Datos recibidos:", data);
-                const rows = data.split("\n").slice(1);
-                let tablaHTML = "";
-                rows.forEach(row => {
-                    const cols = row.split(",").map(col => col.trim());
-                    if (cols.length >= 6) {
-                        tablaHTML += `
-                            <tr>
-                                <td class="border px-4 py-2">${cols[0]}</td>
-                                <td class="border px-4 py-2">${cols[1]}</td>
-                                <td class="border px-4 py-2">${cols[2]}</td>
-                                <td class="border px-4 py-2">${cols[3]}</td>
-                                <td class="border px-4 py-2">${cols[4]}</td>
-                                <td class="border px-4 py-2">${cols[5]}</td>
-                            </tr>
-                        `;
-                    }
-                });
-                document.getElementById("tablaBody").innerHTML = tablaHTML;
-            } catch (error) {
-                console.error("Error al cargar los datos:", error);
-            }
-        }
-
-        cargarDatos(urlLlegadas);
     </script>
 </body>
 </html>
