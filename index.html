@@ -6,40 +6,41 @@
     <title>Alsa Burgos</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 font-sans">
+<body class="bg-gray-100 font-sans">
 
-    <!-- Encabezado -->
-    <div class="bg-[rgb(64,204,236)] text-white p-6 text-center text-4xl font-semibold shadow-lg">
+    <!-- Encabezado con logo -->
+    <div class="bg-blue-700 text-white p-6 text-center text-4xl font-semibold shadow-lg flex items-center justify-center">
+        <img src="https://i.imgur.com/hhuMfIc.png" alt="ALSA Logo" class="h-12 mr-4">
         Alsa Burgos
     </div>
 
     <!-- Día de la semana -->
     <div class="p-6 flex flex-wrap justify-center gap-6">
-        <button id="lunesBtn" class="bg-[rgb(76,190,226)] text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-[rgb(51,178,202)] focus:outline-none">Lunes</button>
-        <button id="martesBtn" class="bg-[rgb(76,190,226)] text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-[rgb(51,178,202)] focus:outline-none">Martes</button>
-        <button id="miercolesBtn" class="bg-[rgb(76,190,226)] text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-[rgb(51,178,202)] focus:outline-none">Miércoles</button>
-        <button id="juevesBtn" class="bg-[rgb(76,190,226)] text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-[rgb(51,178,202)] focus:outline-none">Jueves</button>
-        <button id="viernesBtn" class="bg-[rgb(76,190,226)] text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-[rgb(51,178,202)] focus:outline-none">Viernes</button>
-        <button id="sabadoBtn" class="bg-[rgb(76,190,226)] text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-[rgb(51,178,202)] focus:outline-none">Sábado</button>
-        <button id="domingoBtn" class="bg-[rgb(76,190,226)] text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-[rgb(51,178,202)] focus:outline-none">Domingo</button>
+        <button id="lunesBtn" class="bg-blue-500 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-blue-600 focus:outline-none">Lunes</button>
+        <button id="martesBtn" class="bg-blue-500 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-blue-600 focus:outline-none">Martes</button>
+        <button id="miercolesBtn" class="bg-blue-500 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-blue-600 focus:outline-none">Miércoles</button>
+        <button id="juevesBtn" class="bg-blue-500 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-blue-600 focus:outline-none">Jueves</button>
+        <button id="viernesBtn" class="bg-blue-500 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-blue-600 focus:outline-none">Viernes</button>
+        <button id="sabadoBtn" class="bg-blue-500 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-blue-600 focus:outline-none">Sábado</button>
+        <button id="domingoBtn" class="bg-blue-500 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-blue-600 focus:outline-none">Domingo</button>
     </div>
 
     <!-- Botones de navegación -->
     <div class="p-6 flex flex-wrap justify-center gap-6">
-        <button id="llegadasBtn" class="bg-[rgb(51,178,202)] text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-[rgb(64,204,236)] focus:outline-none">Llegadas</button>
-        <button id="salidasBtn" class="bg-[rgb(51,178,202)] text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-[rgb(64,204,236)] focus:outline-none">Salidas</button>
+        <button id="llegadasBtn" class="bg-green-600 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-green-700 focus:outline-none">Llegadas</button>
+        <button id="salidasBtn" class="bg-red-600 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-red-700 focus:outline-none">Salidas</button>
     </div>
 
     <!-- Tabla de horarios -->
     <div class="p-6 max-w-full mx-auto">
         <table class="min-w-full bg-white shadow-lg rounded-lg overflow-hidden border border-gray-300">
-            <thead class="bg-[rgb(64,204,236)]">
+            <thead class="bg-blue-700 text-white">
                 <tr>
-                    <th class="border px-6 py-4 text-lg font-medium text-gray-600">Empresa</th>
-                    <th class="border px-6 py-4 text-lg font-medium text-gray-600">Hora</th>
-                    <th class="border px-6 py-4 text-lg font-medium text-gray-600" id="origenDestino">Origen</th>
-                    <th class="border px-6 py-4 text-lg font-medium text-gray-600">Dársena</th>
-                    <th class="border px-6 py-4 text-lg font-medium text-gray-600">Observaciones</th>
+                    <th class="border px-6 py-4 text-lg font-medium">Empresa</th>
+                    <th class="border px-6 py-4 text-lg font-medium">Hora</th>
+                    <th class="border px-6 py-4 text-lg font-medium" id="origenDestino">Origen/Destino</th>
+                    <th class="border px-6 py-4 text-lg font-medium">Dársena</th>
+                    <th class="border px-6 py-4 text-lg font-medium">Observaciones</th>
                 </tr>
             </thead>
             <tbody id="tablaBody" class="text-gray-700">
@@ -49,41 +50,8 @@
     </div>
 
     <script>
-        // URLs de Google Sheets para cada día
-        const horarios = {
-            lunes: {
-                llegadas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=0&single=true&output=csv",
-                salidas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1924431758&single=true&output=csv"
-            },
-            martes: {
-                llegadas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=855344185&single=true&output=csv",
-                salidas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=229148559&single=true&output=csv"
-            },
-            miercoles: {
-                llegadas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=915718068&single=true&output=csv",
-                salidas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1144966705&single=true&output=csv"
-            },
-            jueves: {
-                llegadas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1979005713&single=true&output=csv",
-                salidas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1057662853&single=true&output=csv"
-            },
-            viernes: {
-                llegadas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=757759206&single=true&output=csv",
-                salidas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1403147333&single=true&output=csv"
-            },
-            sabado: {
-                llegadas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1896623574&single=true&output=csv",
-                salidas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=746811688&single=true&output=csv"
-            },
-            domingo: {
-                llegadas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1387044438&single=true&output=csv",
-                salidas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLJmk2COJIQ9tJ3UP0lfgqNaBA_bOJu3SwkEy5tBuL_7Xy1OSHO7t8Q9sUAN5b-NCpDu9sMu6hz8kU/pub?gid=1984996999&single=true&output=csv"
-            }
-        };
-
         let diaSeleccionado = "";
 
-        // Asignar eventos a los botones de los días
         document.getElementById("lunesBtn").addEventListener("click", () => { diaSeleccionado = "lunes"; });
         document.getElementById("martesBtn").addEventListener("click", () => { diaSeleccionado = "martes"; });
         document.getElementById("miercolesBtn").addEventListener("click", () => { diaSeleccionado = "miercoles"; });
@@ -92,13 +60,13 @@
         document.getElementById("sabadoBtn").addEventListener("click", () => { diaSeleccionado = "sabado"; });
         document.getElementById("domingoBtn").addEventListener("click", () => { diaSeleccionado = "domingo"; });
 
-        // Función para cargar los horarios
         function cargarHorarios(tipo) {
-            const url = horarios[diaSeleccionado][tipo];
+            if (diaSeleccionado === "") return;
+            const url = "URL_GOOGLE_SHEETS";  // Reemplazar con la URL correspondiente
             fetch(url)
                 .then(response => response.text())
                 .then(csv => {
-                    const rows = csv.split("\n").slice(1); // Eliminar la primera fila de encabezados
+                    const rows = csv.split("\n").slice(1);
                     const tablaBody = document.getElementById("tablaBody");
                     tablaBody.innerHTML = "";
                     rows.forEach(row => {
@@ -115,14 +83,9 @@
                 });
         }
 
-        // Asignar los eventos de las opciones de Llegadas y Salidas
-        document.getElementById("llegadasBtn").addEventListener("click", () => {
-            if (diaSeleccionado !== "") cargarHorarios("llegadas");
-        });
-
-        document.getElementById("salidasBtn").addEventListener("click", () => {
-            if (diaSeleccionado !== "") cargarHorarios("salidas");
-        });
+        document.getElementById("llegadasBtn").addEventListener("click", () => cargarHorarios("llegadas"));
+        document.getElementById("salidasBtn").addEventListener("click", () => cargarHorarios("salidas"));
     </script>
+
 </body>
 </html>
