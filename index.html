@@ -1,91 +1,459 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alsa Burgos</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bizkaibus en tiempo real - Itinerarios en popup</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #e8f5e9;
+    color: #1b5e20;
+  }
+  #map {
+    height: 400px;
+    width: 90%;
+    margin: auto;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  #searchContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    margin: 10px 0;
+    background: #a5d6a7;
+    padding: 10px;
+    border-radius: 10px;
+  }
+  #searchInput {
+    padding: 8px;
+    border: 2px solid #388e3c;
+    border-radius: 5px;
+    width: 200px;
+  }
+  .button {
+    padding: 8px 15px;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .button:hover {
+    background: #1b5e20;
+  }
+  #searchResults {
+    margin-top: 20px;
+    display: none;
+  }
+  #searchResults ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  #searchResults li {
+    margin: 5px 0;
+    cursor: pointer;
+  }
+  #searchResults li:hover {
+    background-color: #c8e6c9;
+  }
+  .navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding: 0 20px;
+  }
+  button {
+    padding: 10px 20px;
+    background-color: #388e3c;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s;
+  }
+  button:hover {
+    background-color: #2e7d32;
+    transform: scale(1.1);
+  }
+  button:disabled {
+    background-color: #c8e6c9;
+    cursor: not-allowed;
+  }
+  button:disabled:hover {
+    background-color: #c8e6c9;
+  }
+  .contact-info {
+    margin-top: 20px;
+    background-color: #a5d6a7;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: left;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .contact-info h3 {
+    margin-top: 0;
+  }
+  .last-updated {
+    font-size: 16px;
+    color: #388e3c;
+    margin-top: 15px;
+  }
+  .itinerary-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 8px;
+    text-align: left;
+    max-height: 150px;
+    overflow-y: auto;
+    border-top: 1px solid #ccc;
+    padding-top: 5px;
+  }
+  .itinerary-list li.passed {
+    text-decoration: line-through;
+    font-style: italic;
+    color: gray;
+  }
+  .itinerary-list li.next {
+    font-weight: bold;
+    color: #1b5e20;
+  }
+</style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body>
+<h2>Bizkaibus en tiempo real 🚍</h2>
 
-    <!-- Encabezado con logo -->
-    <div class="bg-blue-700 text-white p-6 text-center text-4xl font-semibold shadow-lg flex items-center justify-center">
-        <img src="https://i.imgur.com/hhuMfIc.png" alt="ALSA Logo" class="h-12 mr-4">
-        Alsa Burgos
-    </div>
+<div id="searchContainer">
+  <input type="text" id="searchInput" placeholder="Buscar por Bus ID o Línea" oninput="searchStops()" />
+  <button class="button" onclick="searchBus()">Buscar</button>
+</div>
 
-    <!-- Día de la semana -->
-    <div class="p-6 flex flex-wrap justify-center gap-6">
-        <button id="lunesBtn" class="bg-blue-500 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-blue-600 focus:outline-none">Lunes</button>
-        <button id="martesBtn" class="bg-blue-500 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-blue-600 focus:outline-none">Martes</button>
-        <button id="miercolesBtn" class="bg-blue-500 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-blue-600 focus:outline-none">Miércoles</button>
-        <button id="juevesBtn" class="bg-blue-500 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-blue-600 focus:outline-none">Jueves</button>
-        <button id="viernesBtn" class="bg-blue-500 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-blue-600 focus:outline-none">Viernes</button>
-        <button id="sabadoBtn" class="bg-blue-500 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-blue-600 focus:outline-none">Sábado</button>
-        <button id="domingoBtn" class="bg-blue-500 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-blue-600 focus:outline-none">Domingo</button>
-    </div>
+<div id="searchResults">
+  <ul id="resultsList"></ul>
+  <div class="navigation-buttons">
+    <button id="prevBtn" onclick="navigateResults('prev')" disabled>&lt; Anterior</button>
+    <button id="nextBtn" onclick="navigateResults('next')" disabled>Siguiente &gt;</button>
+  </div>
+</div>
 
-    <!-- Botones de navegación -->
-    <div class="p-6 flex flex-wrap justify-center gap-6">
-        <button id="llegadasBtn" class="bg-green-600 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-green-700 focus:outline-none">Llegadas</button>
-        <button id="salidasBtn" class="bg-red-600 text-white px-8 py-4 rounded-lg text-2xl transition duration-300 hover:bg-red-700 focus:outline-none">Salidas</button>
-    </div>
+<div id="map"></div>
 
-    <!-- Tabla de horarios -->
-    <div class="p-6 max-w-full mx-auto">
-        <table class="min-w-full bg-white shadow-lg rounded-lg overflow-hidden border border-gray-300">
-            <thead class="bg-blue-700 text-white">
-                <tr>
-                    <th class="border px-6 py-4 text-lg font-medium">Empresa</th>
-                    <th class="border px-6 py-4 text-lg font-medium">Hora</th>
-                    <th class="border px-6 py-4 text-lg font-medium" id="origenDestino">Origen/Destino</th>
-                    <th class="border px-6 py-4 text-lg font-medium">Dársena</th>
-                    <th class="border px-6 py-4 text-lg font-medium">Observaciones</th>
-                </tr>
-            </thead>
-            <tbody id="tablaBody" class="text-gray-700">
-                <!-- Datos se insertarán aquí -->
-            </tbody>
-        </table>
-    </div>
+<div class="contact-info">
+  <h3>Contacto</h3>
+  <p><b>Desarrollado por Eneko Cantero</b></p>
+  <p><b>Correo:</b> <a href="mailto:ecanteroalvarez@gmail.com">ecanteroalvarez@gmail.com</a></p>
+  <p><b>Instagram:</b> <a href="https://instagram.com/enekituss_spotter" target="_blank">@enekituss_spotter</a></p>
+</div>
 
-    <script>
-        let diaSeleccionado = "";
+<div class="last-updated" id="lastUpdated">Última actualización: N/A</div>
 
-        document.getElementById("lunesBtn").addEventListener("click", () => { diaSeleccionado = "lunes"; });
-        document.getElementById("martesBtn").addEventListener("click", () => { diaSeleccionado = "martes"; });
-        document.getElementById("miercolesBtn").addEventListener("click", () => { diaSeleccionado = "miercoles"; });
-        document.getElementById("juevesBtn").addEventListener("click", () => { diaSeleccionado = "jueves"; });
-        document.getElementById("viernesBtn").addEventListener("click", () => { diaSeleccionado = "viernes"; });
-        document.getElementById("sabadoBtn").addEventListener("click", () => { diaSeleccionado = "sabado"; });
-        document.getElementById("domingoBtn").addEventListener("click", () => { diaSeleccionado = "domingo"; });
+<script>
+  var map = L.map('map').setView([43.28, -2.98], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
 
-        function cargarHorarios(tipo) {
-            if (diaSeleccionado === "") return;
-            const url = "URL_GOOGLE_SHEETS";  // Reemplazar con la URL correspondiente
-            fetch(url)
-                .then(response => response.text())
-                .then(csv => {
-                    const rows = csv.split("\n").slice(1);
-                    const tablaBody = document.getElementById("tablaBody");
-                    tablaBody.innerHTML = "";
-                    rows.forEach(row => {
-                        const cols = row.split(",");
-                        const tr = document.createElement("tr");
-                        cols.forEach(col => {
-                            const td = document.createElement("td");
-                            td.classList.add("border", "px-6", "py-4", "text-lg");
-                            td.textContent = col.trim();
-                            tr.appendChild(td);
-                        });
-                        tablaBody.appendChild(tr);
-                    });
-                });
+  var busMarkers = {};
+  var stopNames = {};
+  var journeyDestinations = {};
+  var buses = [];
+  var itineraries = {}; // { journeyRef: [{stopId, stopName, time}] }
+  var searchResults = [];
+  var currentIndex = -1;
+  var lastUpdateTime = '';
+
+  var userIcon = L.icon({
+    iconUrl: 'https://i.imgur.com/kVg4T5Q.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30]
+  });
+
+  // Carga lista de paradas
+  async function loadStopData() {
+    let url = "https://raw.githubusercontent.com/enekituss/bizkaibus-data/main/lista%20paradas%20ID%20chatgpt.txt";
+
+    try {
+      let response = await fetch(url);
+      let text = await response.text();
+
+      let lines = text.split("\n");
+      for (let line of lines) {
+        let parts = line.split(" - ");
+        if (parts.length === 2) {
+          let stopId = parts[0].trim();
+          let stopName = parts[1].trim();
+          stopNames[stopId] = stopName;
         }
+      }
+      console.log("Paradas cargadas:", Object.keys(stopNames).length);
+    } catch (error) {
+      console.error("Error al cargar las paradas:", error);
+    }
+  }
 
-        document.getElementById("llegadasBtn").addEventListener("click", () => cargarHorarios("llegadas"));
-        document.getElementById("salidasBtn").addEventListener("click", () => cargarHorarios("salidas"));
-    </script>
+  // Carga destinos desde CSV Google Sheets
+  async function loadJourneyDestinations() {
+    let url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJxVYnmoh5jbZ5HRcJToHapoPewZIlrdSEDdlvOH1H_mWKwme1FiTobj1hIrolKw/pub?output=csv";
+
+    try {
+      let response = await fetch(url);
+      let text = await response.text();
+
+      let lines = text.split("\n");
+      for (let line of lines) {
+        let parts = line.split(",");
+        if (parts.length >= 2) {
+          let ref = parts[0].trim();
+          let destino = parts[1].trim();
+          journeyDestinations[ref] = destino;
+        }
+      }
+      console.log("Destinos cargados:", Object.keys(journeyDestinations).length);
+    } catch (error) {
+      console.error("Error al cargar los destinos:", error);
+    }
+  }
+
+  // Carga itinerarios desde Google Sheets CSV con PapaParse
+  async function loadItineraries() {
+    let csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRfb4XNsb97EzYB8a_jWnQmEw6jtCUvQPZRSZ8mcqL8c9KcvBPVaodCC9TzUK6inA/pub?output=csv";
+
+    return new Promise((resolve, reject) => {
+      Papa.parse(csvUrl, {
+        download: true,
+        header: true,
+        complete: function(results) {
+          // Estructura asumida columnas: VehicleJourneyRef, StopPointRef, StopName, ArrivalTime
+          results.data.forEach(row => {
+            let journeyRef = row.VehicleJourneyRef?.trim();
+            let stopId = row.StopPointRef?.trim();
+            let stopName = row.StopName?.trim() || stopNames[stopId] || 'Parada desconocida';
+            let time = row.ArrivalTime?.trim() || null;
+
+            if (!journeyRef) return;
+
+            if (!itineraries[journeyRef]) itineraries[journeyRef] = [];
+            itineraries[journeyRef].push({ stopId, stopName, time });
+          });
+
+          // Ordenar itinerarios por hora si hay ArrivalTime
+          for (let key in itineraries) {
+            itineraries[key].sort((a,b) => {
+              if (!a.time) return 1;
+              if (!b.time) return -1;
+              return a.time.localeCompare(b.time);
+            });
+          }
+
+          console.log("Itinerarios cargados para viajes:", Object.keys(itineraries).length);
+          resolve();
+        },
+        error: function(err) {
+          console.error("Error al cargar itinerarios CSV:", err);
+          reject(err);
+        }
+      });
+    });
+  }
+
+  // Función para calcular qué paradas ya pasaron o son la siguiente, basándonos en hora actual y tiempos del itinerario
+  function markStopsStatus(itinerary) {
+    if (!itinerary || itinerary.length === 0) return [];
+
+    let now = new Date();
+    let nowStr = now.toTimeString().slice(0,5); // "HH:MM"
+
+    // Suponemos horarios en formato "HH:MM" 24h
+
+    let foundNext = false;
+
+    return itinerary.map(stop => {
+      let stopTime = stop.time || "99:99";
+      let passed = false;
+      let isNext = false;
+
+      if (!stop.time) {
+        // Si no hay hora, asumimos "no pasada" ni siguiente
+      } else if (stopTime < nowStr) {
+        passed = true;
+      } else if (!foundNext) {
+        isNext = true;
+        foundNext = true;
+      }
+
+      return {...stop, passed, isNext};
+    });
+  }
+
+  // Actualiza posición de buses y sus popups
+  async function updateBuses() {
+    try {
+      // Carga XML con proxy para evitar CORS
+      let response = await fetch("https://corsproxy.io/?https://opendata.bizkaia.eus/geoserver/opendata/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=opendata:emovi_vehiculos&outputFormat=application/json");
+      let data = await response.json();
+
+      let features = data.features || [];
+
+      // Para guardar marcadores no usados esta ronda
+      let usedBusIds = new Set();
+
+      for (let feature of features) {
+        let props = feature.properties || {};
+        let id = props.VehicleJourneyRef || props.id || props.IdVehiculo || props.VehicleRef || null;
+        let lat = feature.geometry?.coordinates[1];
+        let lon = feature.geometry?.coordinates[0];
+
+        if (!id || !lat || !lon) continue;
+
+        usedBusIds.add(id);
+
+        if (!busMarkers[id]) {
+          let marker = L.marker([lat, lon]).addTo(map);
+          busMarkers[id] = marker;
+
+          marker.on('click', () => {
+            showBusPopup(id);
+          });
+        } else {
+          busMarkers[id].setLatLng([lat, lon]);
+        }
+      }
+
+      // Limpiar marcadores que ya no están
+      for (let id in busMarkers) {
+        if (!usedBusIds.has(id)) {
+          map.removeLayer(busMarkers[id]);
+          delete busMarkers[id];
+        }
+      }
+
+      document.getElementById('lastUpdated').textContent = "Última actualización: " + new Date().toLocaleTimeString();
+
+    } catch (e) {
+      console.error("Error actualizando buses:", e);
+    }
+  }
+
+  // Mostrar popup con info y itinerario
+  function showBusPopup(id) {
+    let marker = busMarkers[id];
+    if (!marker) return;
+
+    // Buscar destino del viaje
+    let destino = journeyDestinations[id] || "Destino no disponible";
+
+    // Buscar itinerario
+    let itinerary = itineraries[id] || [];
+
+    let itineraryStatus = markStopsStatus(itinerary);
+
+    let html = `<b>Bus ID:</b> ${id}<br/><b>Destino:</b> ${destino}<br/><b>Itinerario:</b><ul class="itinerary-list">`;
+
+    for (let stop of itineraryStatus) {
+      let cls = stop.passed ? "passed" : (stop.isNext ? "next" : "");
+      html += `<li class="${cls}">${stop.stopName} ${stop.time ? '(' + stop.time + ')' : ''}</li>`;
+    }
+
+    html += "</ul>";
+
+    marker.bindPopup(html).openPopup();
+  }
+
+  // Search helpers
+  function searchStops() {
+    let query = document.getElementById('searchInput').value.trim().toLowerCase();
+    if (!query) {
+      document.getElementById('searchResults').style.display = 'none';
+      searchResults = [];
+      currentIndex = -1;
+      updateNavigationButtons();
+      return;
+    }
+
+    searchResults = [];
+
+    // Buscar en buses y destinos
+    for (let id in journeyDestinations) {
+      let destino = journeyDestinations[id].toLowerCase();
+      if (id.toLowerCase().includes(query) || destino.includes(query)) {
+        searchResults.push(id);
+      }
+    }
+
+    if (searchResults.length > 0) {
+      document.getElementById('searchResults').style.display = 'block';
+      renderSearchResults();
+      currentIndex = 0;
+      updateNavigationButtons();
+    } else {
+      document.getElementById('searchResults').style.display = 'none';
+    }
+  }
+
+  function renderSearchResults() {
+    let ul = document.getElementById('resultsList');
+    ul.innerHTML = '';
+    searchResults.forEach((id, idx) => {
+      let li = document.createElement('li');
+      li.textContent = `${id} → ${journeyDestinations[id] || ''}`;
+      li.style.fontWeight = (idx === currentIndex) ? 'bold' : 'normal';
+      li.onclick = () => {
+        currentIndex = idx;
+        updateNavigationButtons();
+        centerBus(id);
+      };
+      ul.appendChild(li);
+    });
+  }
+
+  function updateNavigationButtons() {
+    document.getElementById('prevBtn').disabled = (currentIndex <= 0);
+    document.getElementById('nextBtn').disabled = (currentIndex >= searchResults.length - 1);
+  }
+
+  function navigateResults(dir) {
+    if (dir === 'prev' && currentIndex > 0) {
+      currentIndex--;
+    } else if (dir === 'next' && currentIndex < searchResults.length - 1) {
+      currentIndex++;
+    }
+    renderSearchResults();
+    centerBus(searchResults[currentIndex]);
+    updateNavigationButtons();
+  }
+
+  function centerBus(id) {
+    let marker = busMarkers[id];
+    if (!marker) {
+      alert("Bus no encontrado en la posición actual");
+      return;
+    }
+    map.setView(marker.getLatLng(), 15);
+    showBusPopup(id);
+  }
+
+  // Carga inicial y ciclo de actualización
+  async function init() {
+    await loadStopData();
+    await loadJourneyDestinations();
+    await loadItineraries();
+    await updateBuses();
+
+    setInterval(updateBuses, 20000);
+  }
+
+  init();
+</script>
 
 </body>
 </html>
